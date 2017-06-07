@@ -1,6 +1,4 @@
-#include <Wire.h>
-#include <BMP280.h>
-#include <HDC100X.h>
+#include "sensors.h"
 
 BMP280 bmp;
 
