@@ -97,3 +97,14 @@ long getMicVal()
   micVal = constrain(abs(micVal / period), 1, 500);
   return (micVal);
 }
+
+void Ultrasonic()
+{
+  digitalWrite(trig, HIGH);
+  delay(15);
+  digitalWrite(trig, LOW);
+  time = pulseIn(echo, HIGH, 1000);
+  distance = 0.17 * time;
+  Serial.println(distance);
+}
+  
