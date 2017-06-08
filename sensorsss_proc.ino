@@ -20,6 +20,9 @@ float refVal = 0.4;
 
 HDC100X hdc(0x43);
 
+int mic = A0;
+long micVal = 0; // Stores the value of the sound collected by the microphone
+
 
 
 void setup() {
@@ -54,6 +57,10 @@ void setup() {
   Wire.write((IT_1<<2) | 0x02);
   Wire.endTransmission();
   delay(500);
+  
+  /* Microphone */
+  
+  pinMode(mic, INPUT);
 }
 
 
@@ -75,5 +82,9 @@ humidity();
 /* UV */
 
 UVSensor();
+  
+/* Microphone */
+
+Microphone();
 
 }
