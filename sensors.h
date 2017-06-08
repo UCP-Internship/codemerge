@@ -13,5 +13,10 @@ void humidity();
 
 void UVSensor();
 // prints UV index
-  float getUVI(int uv);
-  // gets UV value
+
+float getUVI(int uv);
+// gets UV value
+
+void Microphone();
+// prints mic values
+
