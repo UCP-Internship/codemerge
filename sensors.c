@@ -79,3 +79,21 @@ float getUVI(int uv) {
   float uvi = refVal * (uv * 5.625) / 1000;
   return uvi;
 }
+
+void Microphone ()
+{
+    Serial.println(getMicVal());
+}
+
+long getMicVal() 
+{
+  int period = 3; // Averaging three values in order to catch any 'outliers'
+  int correction_value = 510;
+  for (int i = 0; i < period; i++) {
+    // Computes the absolute value of the value to intercept negative deflections
+    micVal = micVal + abs (analogRead(mic) - correction_value);
+    delay(5);
+  }
+  micVal = constrain(abs(micVal / period), 1, 500);
+  return (micVal);
+}
