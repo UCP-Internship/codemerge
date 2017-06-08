@@ -20,3 +20,5 @@ float getUVI(int uv);
 void Microphone();
 // prints mic values
 
+void Ultrasonic();
+// Measures the distance
