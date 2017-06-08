@@ -23,6 +23,9 @@ HDC100X hdc(0x43);
 int mic = A0;
 long micVal = 0; // Stores the value of the sound collected by the microphone
 
+#define trig 11
+#define echo 12
+int time, distance, state;
 
 
 void setup() {
@@ -61,13 +64,19 @@ void setup() {
   /* Microphone */
   
   pinMode(mic, INPUT);
+  
+  /* Ultrasonic */
+  
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+  
 }
 
 
 
 void loop() {
 
-// Light sensor 
+/* Light sensor */
 
 LightSensor();
 
@@ -86,5 +95,9 @@ UVSensor();
 /* Microphone */
 
 Microphone();
-
+  
+/* Ultrasonic */
+  
+Ultrasonic();  
+  
 }
