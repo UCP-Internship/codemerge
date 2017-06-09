@@ -1,5 +1,5 @@
 
-Skip to content
+/*Skip to content
 This repository
 
     Pull requests
@@ -23,14 +23,23 @@ Wiki
 Settings
 codemerge/wifi_list_connection.ino
 724e546 2 minutes ago
-@Smerilys Smerilys Create wifi_list_connection.ino
-182 lines (159 sloc) 4.4 KB
+@Smerilys Smerilys Create wifi_list_connection.ino 
+182 lines (159 sloc) 4.4 KB */
 #include <SPI.h>
 #include <WiFi101.h>
+#include <Wire.h>
+#include <HDC100X.h>
+
+//Wifi code
 
 char ssid[] = "iPhone de Timothee";     //  your network SSID (name)
 char pass[] = "wfvh69thrsuro";  // your network password
 int status = WL_IDLE_STATUS;     // the WiFi radio's status
+
+// Sensors code
+
+HDC100X hdc(0x43);
+float humidity, temperature;
 
 void setup() {
   //Initialize serial and wait for port to open:
@@ -39,7 +48,7 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  // check for the presence of the shield:
+  // check for the presence of the Wifi shield:
   if (WiFi.status() == WL_NO_SHIELD) {
     Serial.println("WiFi shield not present");
     // don't continue:
@@ -68,17 +77,21 @@ void setup() {
   Serial.print("You're connected to the network");
   printCurrentNet();
   printWiFiData();
+  
+  // Initialize the sensor  
+  hdc.begin(HDC100X_TEMP_HUMI, HDC100X_14BIT, DISABLE);
 
 }
 
-void loop() {
-  delay(10000);
-  // scan for existing networks:
-  Serial.println("Scanning available networks...");
-  listNetworks();
-  // check the network connection once every 10 seconds:
-  delay(10000);
-  printCurrentNet();
+void loop() 
+{
+  // Gets both values that interest us
+  humidity = hdc.getHumi();
+  temperature = hdc.getTemp();
+    
+  // Upload both values to the openSenseMap
+  postFloatValue((float)temperature, 4, TEMPSENSOR_ID);
+  postFloatValue((float)humidity, 4, TEMPSENSOR_ID);
 }
 
 void printMacAddress() {
@@ -206,8 +219,9 @@ void printCurrentNet() {
   Serial.println(encryption, HEX);
   Serial.println();
 }
-
+/*
     Contact GitHub API Training Shop Blog About 
 
     © 2017 GitHub, Inc. Terms Privacy Security Status Help 
+*/
 
