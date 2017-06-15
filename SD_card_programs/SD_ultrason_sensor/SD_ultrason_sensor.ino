@@ -29,13 +29,13 @@ void setup()
 
 void loop() 
 {
-  delay(400);
+  delay(500);
   
   distance = getDistance();
   
   // Display the distance to the sensor
-  Serial.print("Distance: ");
-  Serial.println(distance);
+  //Serial.print("Distance: ");
+  //Serial.println(distance);
   
   // If there isn't anyone in front of the sensor
   if(state == 0)
@@ -57,8 +57,8 @@ void loop()
     }
     
     // Display distance to person
-    Serial.print("Distance: ");
-    Serial.println(distance);
+    //Serial.print("Distance: ");
+    //Serial.println(distance);
   }
   if(state == 2)
   {
@@ -66,13 +66,13 @@ void loop()
     nb_people ++;
   
     // No one in front of sensor anymore
-    state = 0;
+    //state = 0;
   
     // Display the new number
     Serial.print("Number of people: ");
     Serial.println(nb_people);
   
-    // Write the value in a txt file on the SD card
+    // Write the value in a txt file on the SD card then close it
     nb_ppl = SD.open("nb_people.txt");
     nb_ppl.println(nb_people); 
     nb_ppl.close();
@@ -80,6 +80,7 @@ void loop()
     // No one in front of sensor anymore
     state = 0;
   }
+  
 }
 
 int getDistance()
@@ -100,4 +101,3 @@ int getDistance()
   temp_distance = duration*0.034/2;
   return temp_distance;
 }
-
