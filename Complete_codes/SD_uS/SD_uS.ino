@@ -18,7 +18,7 @@ File US_data;
 // Variables
 int nb_people = 0; // People counter
 int distance; // Distance to sensor
-unsigned int echo_time; // Time counter
+unsigned int echo_time; // Time it takes to the signal to come back to the sensor
 int state = 0; // What is happening in front of the sensor (no one / someone)
 
 void setup()
