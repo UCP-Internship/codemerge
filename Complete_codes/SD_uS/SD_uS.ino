@@ -71,7 +71,7 @@ int ppl_counter(int temp_state, int temp_dist, int nb_people)
     // Person in front of device, move to next step
     if(distance < 100)
       return 1; 
-    // No one in front of the device, for a person to arrive
+    // No one in front of the device, wait for a person to arrive
     else
       return 0;
   }
