@@ -21,7 +21,7 @@ char bmpStatus;
 #define SENSOR2_ID "59492170a4ad5900113d4d60" // Presence
 #define SENSOR3_ID "59492170a4ad5900113d4d5f" // Pressure
 
-IPAddress ip(10, 10, 4, 170);
+IPAddress ip(10, 10, 4, 221);
 IPAddress dns(10, 10, 4, 251);
 IPAddress gateway(10, 10, 4, 250);
 IPAddress subnet(255, 255, 255, 0);
