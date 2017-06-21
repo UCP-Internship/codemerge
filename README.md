@@ -4,6 +4,8 @@
 
 1. All the [libraries](https://github.com/UCP-Internship/codemerge/tree/master/libraries) are included in the project. To install them, compress the files to a .zip format and simply add them via the arduino app.
 
-2. You can find the code for individual sensors [here](https://github.com/UCP-Internship/codemerge/tree/master/Sensors_only).
+2. You can find the code for each individual sensors [here](https://github.com/UCP-Internship/codemerge/tree/master/Sensors_only), or the code for some combinations between different sensors [here]((https://github.com/UCP-Internship/codemerge/tree/master/Complete_codes).
 
-3. 
+3. Codes for the SD card shield can be found [here](https://github.com/UCP-Internship/codemerge/tree/master/SD_card_programs) and codes for the Wifi shield can be found [here](https://github.com/UCP-Internship/codemerge/tree/master/WiFi).
+
+
