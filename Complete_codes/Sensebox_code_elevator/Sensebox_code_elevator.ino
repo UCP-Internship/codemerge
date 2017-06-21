@@ -21,8 +21,12 @@ char bmpStatus;
 #define SENSOR2_ID "59492170a4ad5900113d4d60" // Presence
 #define SENSOR3_ID "59492170a4ad5900113d4d5f" // Pressure
 
+IPAddress ip(10, 10, 4, 170);
+IPAddress dns(10, 10, 4, 251);
+IPAddress gateway(10, 10, 4, 250);
+IPAddress subnet(255, 255, 255, 0);
 
-
+const char *server = "ingress.opensensemap.org";
 const int trigPin = 8;
 const int echoPin = 9;
 
@@ -59,9 +63,7 @@ void setup () {
   }
   bmp.setOversampling(4); // select resolution of the measurements
   
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+  WiFi.config(ip, dns, gateway, subnet);
   while ( status != WL_CONNECTED) {
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
