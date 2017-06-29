@@ -19,7 +19,7 @@
 #define ECHO_PIN     9   // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define dist_to_ppl 150 // Distance under which it is considered that someone is in front of the sensor
 #define MIC_PORT A0  // Microphone port
-#define UPDATE_TIME 213 // Write on the SD card every x loop
+#define UPDATE_TIME 60000 // Write on the SD card every x loop
 
 // Declare the Us sensor
 NewPing sensor(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
@@ -32,7 +32,6 @@ File door_data;
 
 // Variables
   // General
-  int counter = 0;
   unsigned long uptime = 0;
   
   // Ultrasound
@@ -49,7 +48,7 @@ File door_data;
 
 void setup()
 {
-  //Serial.begin(115200);
+  Serial.begin(115200);
   //while(!Serial){;}
   
   // Initialize the humidity/temperature sensor
@@ -58,7 +57,7 @@ void setup()
   // Initialize the SD card
   if(!SD.begin(4))
   {
-    //Serial.println("Failed to initialize. Stopping now...");
+    Serial.println("Failed to initialize. Stopping now...");
     for(;;);
   }
   
@@ -67,29 +66,49 @@ void setup()
   pinMode(MIC_PORT, INPUT);
   
   // Creates file on the SD card and closes it instantly
-  door_data = SD.open("doordata.txt", FILE_WRITE);
+  door_data = SD.open("dodatre.csv", FILE_WRITE);
   door_data.close();
   // If the file wasn't created, stop there
-  if(!SD.exists("doordata.txt"))
+  if(!SD.exists("dodatre.csv"))
   {
-    //Serial.println("Failed to create 'doordata.txt' file. Stopping now...");
+    Serial.println("Failed to create 'dodatre.csv' file. Stopping now...");
     for(;;);
   }
   // Start 
-  //Serial.println("starting");
+  Serial.println("starting");
 }
 
 void loop()
 {
   delay(50); // Send ping about 20 times per second
   
-  // Time since the beginning of the program in milliseconds
-  uptime = millis();
-  
-  // Upload values on SD card every 20 seconds
-  if(counter == UPDATE_TIME)
+  // Upload values on SD card every 60 seconds
+  if((millis() - uptime) > UPDATE_TIME)
   {
-    write_file(nb_people, humidity, temperature, sound_lvl, uptime);
+    write_file(humidity, temperature, sound_lvl, uptime);
+      Serial.println("\n==============================");
+      File myFile = SD.open("dodatre.csv");
+      if (myFile) 
+      {
+        Serial.println("dodatre.csv:");
+  
+        // read from the file until there's nothing else in it:
+        while (myFile.available()) 
+        {
+          Serial.write(myFile.read());
+        }
+        // close the file:
+        myFile.close();
+      } 
+      else 
+      {
+        // if the file didn't open, print an error:
+        Serial.println("error opening dodatre.csv");
+      }
+      Serial.println("\n==============================");  
+    
+    // Time since the beginning of the program in milliseconds
+    uptime = millis();
   }
   
   // Measure 
@@ -105,14 +124,11 @@ void loop()
     sound_lvl = getMicVal();
   
   // Update distance value
-  state = ppl_counter(state, distance, &nb_people);
-  
-  // Number of loops done
-  counter ++;
+  state = ppl_counter(state, distance);
 }
 
 // Manages people counter
-int ppl_counter(int temp_state, int temp_dist, int *nb_people)
+int ppl_counter(int temp_state, int temp_dist)
 {
   // No one in front of sensor yet
   if(temp_state == 0)
@@ -131,7 +147,7 @@ int ppl_counter(int temp_state, int temp_dist, int *nb_people)
     // Nobody in front of device anymore, add 1 person to counter and wait for another person
     if(temp_dist >= dist_to_ppl)
     {
-      update_ppl(nb_people);
+      update_ppl();
       return 0;
     }
     // Person still in front of device, wait for him to leave
@@ -141,12 +157,13 @@ int ppl_counter(int temp_state, int temp_dist, int *nb_people)
 }
 
 // Writes new values on the SD card
-void write_file(int ppl, int humidity, int temperature, int snd_lvl, unsigned long uptime)
+void write_file(int humidity, int temperature, int snd_lvl, unsigned long uptime)
 {
-  door_data = SD.open("doordata1.csv", FILE_WRITE);
+  Serial.println("in write_file");
+  door_data = SD.open("dodatre.csv", FILE_WRITE);
   door_data.print(uptime);
   door_data.print(";");
-  door_data.print(ppl);
+  door_data.print(nb_people);
   door_data.print(";");
   door_data.print(humidity);
   door_data.print(";");
@@ -158,11 +175,11 @@ void write_file(int ppl, int humidity, int temperature, int snd_lvl, unsigned lo
 }
 
 // Update the people counter
-void update_ppl(int *nb_ppl)
+void update_ppl()
 {
-  (*nb_ppl) += 1;
-  //Serial.print("One more person! Total of people :");
-  //Serial.println(*nb_ppl);
+  (nb_people) += 1;
+  Serial.print("One more person! Total of people :");
+  Serial.println(nb_people);
 }
 
 // Gets value of sound
