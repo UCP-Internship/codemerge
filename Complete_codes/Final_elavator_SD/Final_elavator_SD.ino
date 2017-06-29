@@ -14,10 +14,10 @@
 #include <NewPing.h>
 
 // Constants
-#define MAX_DISTANCE 390 // Sensor doesn't detect farther than 3.90 m
+#define MAX_DISTANCE 399 // Sensor doesn't detect farther than 3.90 m
 #define TRIGGER_PIN  8  // Arduino pin tied to trigger pin on the ultrasonic sensor.
 #define ECHO_PIN     9   // Arduino pin tied to echo pin on the ultrasonic sensor.
-#define UPDATE_TIME 192 // Write on the SD card every x loop
+#define UPDATE_TIME 60000 // Write on the SD card every x loop
 
 // Declare the Us sensor
 NewPing sensor(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
@@ -30,7 +30,6 @@ File elevator_data;
 
 // Variables
   // General
-  int counter = 0;
   unsigned long uptime = 0;
   
   // Ultrasound
@@ -46,7 +45,7 @@ File elevator_data;
 
 void setup()
 {
-  //Serial.begin(115200);
+  Serial.begin(115200);
   //while(!Serial){;}
   
   // Initialize the pressure/temperature sensor and stop if it failed
@@ -59,41 +58,64 @@ void setup()
   // Initialize the SD card
   if(!SD.begin(4))
   {
-    //Serial.println("Failed to initialize. Stopping now...");
+    Serial.println("Failed to initialize. Stopping now...");
     for(;;);
   }
   bmp.setOversampling(4); // select resolution of the measurements
   pinMode(10, OUTPUT); 
   
   // Creates file on the SD card and closes it instantly
-  elevator_data = SD.open("elevator.txt", FILE_WRITE);
+  elevator_data = SD.open("eledatatr.csv", FILE_WRITE);
   elevator_data.close();
   
   echo_time = sensor.ping();
-  dist_max = sensor.convert_cm(echo_time)-40;
+  dist_max = sensor.convert_cm(echo_time)-20;
+  if(dist_max < 250)
+    dist_max = 250;
+  Serial.print("dist_max = ");
+  Serial.println(dist_max);
   
   // If the file wasn't created, stop there
-  if(!SD.exists("elevator.txt"))
+  if(!SD.exists("eledatatr.csv"))
   {
-    //Serial.println("Failed to create 'elevator.txt' file. Stopping now...");
+    Serial.println("Failed to create 'eledatatr.csv' file. Stopping now...");
     for(;;);
   }
   // Start 
-  //Serial.println("starting");
+  Serial.println("starting");
 }
 
 void loop()
 {
   delay(50); // Send ping about 20 times per second
   
-  // Time since the beginning of the program in milliseconds
-  uptime = millis();
-  
   // Upload values on SD card every 20 seconds
-  if(counter == UPDATE_TIME)
+  if(millis() - uptime > UPDATE_TIME)
   {
-    write_file(nb_people, pressure, temperature, uptime);
-    counter = 0;
+    write_file(pressure, temperature, uptime);
+    
+      Serial.println("\n==============================");
+      File myFile = SD.open("eledatatr.csv");
+      if (myFile) 
+      {
+        Serial.println("eledatatr.csv:");
+  
+        // read from the file until there's nothing else in it:
+        while (myFile.available()) 
+        {
+          Serial.write(myFile.read());
+        }
+        // close the file:
+        myFile.close();
+      } 
+      else 
+      {
+        // if the file didn't open, print an error:
+        Serial.println("error opening eledatatr.csv");
+      }
+      Serial.println("\n==============================");    
+    
+    uptime = millis();
   }
   
   // Measure 
@@ -111,14 +133,11 @@ void loop()
     distance = sensor.convert_cm(echo_time); // Converts time to distance in cm
   
   // Update distance value
-  state = ppl_counter(state, distance, &nb_people, dist_max);
-  
-  // Number of loops done
-  counter ++;
+  state = ppl_counter(state, distance, dist_max);
 }
 
 // Manages people counter
-int ppl_counter(int temp_state, int temp_dist, int *nb_people, int dist_to_ppl)
+int ppl_counter(int temp_state, int temp_dist, int dist_to_ppl)
 {
   // No one in front of sensor yet
   if(temp_state == 0)
@@ -137,7 +156,7 @@ int ppl_counter(int temp_state, int temp_dist, int *nb_people, int dist_to_ppl)
     // Nobody in front of device anymore, add 1 person to counter and wait for another person
     if(temp_dist >= dist_to_ppl)
     {
-      update_ppl(nb_people);
+      update_ppl();
       return 0;
     }
     // Person still in front of device, wait for him to leave
@@ -147,12 +166,12 @@ int ppl_counter(int temp_state, int temp_dist, int *nb_people, int dist_to_ppl)
 }
 
 // Writes new values on the SD card
-void write_file(int ppl, int pressure, int temperature, unsigned long uptime)
+void write_file(int pressure, int temperature, unsigned long uptime)
 {
-  elevator_data = SD.open("elevatordata1.csv", FILE_WRITE);
+  elevator_data = SD.open("eledatatr.csv", FILE_WRITE);
   elevator_data.print(uptime);
   elevator_data.print(";");
-  elevator_data.print(ppl);
+  elevator_data.print(nb_people);
   elevator_data.print(";");
   elevator_data.print(pressure);
   elevator_data.print(";");
@@ -162,9 +181,9 @@ void write_file(int ppl, int pressure, int temperature, unsigned long uptime)
 }
 
 // Update the people counter
-void update_ppl(int *nb_ppl)
+void update_ppl()
 {
-  (*nb_ppl) += 1;
-  //Serial.print("One more person! Total of people :");
-  //Serial.println(*nb_ppl);
+  nb_people += 1;
+  Serial.print("One more person! Total of people :");
+  Serial.println(nb_people);
 }
